@@ -30,3 +30,9 @@ node_modules
 
 ### Vagrant template
 .vagrant/
+
+###
+.DS_Store
+
+coverage
+.nyc_output

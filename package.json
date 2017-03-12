@@ -4,21 +4,35 @@
   "description": "A node library to communicate with tor-control",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "nyc --reporter=html --reporter=text mocha test/index.js",
+    "coverage": "nyc mocha test/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/atd-schubert/node-tor-control.git"
+    "url": "git+https://github.com/atsman/node-tor-control.git"
   },
   "keywords": [
     "tor",
     "tor-control",
     "tcp"
   ],
-  "author": "Arne Schubert <atd.schubert@gmail.com>",
+  "author": "Aleh Atsman <aleh.atsman@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/atd-schubert/node-tor-control/issues"
+    "url": "https://github.com/atsman/node-tor-control/issues"
   },
-  "homepage": "https://github.com/atd-schubert/node-tor-control#readme"
+  "homepage": "https://github.com/atsman/node-tor-control#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.16.1",
+    "eslint-config-airbnb-base": "^11.1.0",
+    "eslint-plugin-async-await": "^0.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.2.0",
+    "nyc": "^10.1.2",
+    "sinon": "^1.17.7",
+    "sinon-chai": "^2.8.0"
+  },
+  "dependencies": {}
 }
