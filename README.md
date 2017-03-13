@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Atsman/node-tor-control.svg?branch=master)](https://travis-ci.org/Atsman/node-tor-control)
+
 # node-tor-control
 A node library to communicate with tor-control
 
