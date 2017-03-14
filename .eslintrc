@@ -11,7 +11,7 @@
       }
     },
     "plugins": [
-      'async-await'
+      "async-await"
     ],
     "rules": {
       "linebreak-style": 0,

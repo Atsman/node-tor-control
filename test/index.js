@@ -1,10 +1,10 @@
 'use strict';
 
 const chai = require('chai');
-const sinon = require('sinon');
-const sinonChai = require("sinon-chai");
+const sinonChai = require('sinon-chai');
 
 chai.use(sinonChai);
 
+require('./connection.spec');
 require('./tor.spec');
 
