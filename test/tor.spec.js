@@ -14,12 +14,15 @@ describe('tor', () => {
       const connectionMock = new ConnectionMock();
       connectionMock.onWrite(function onWriteCb(msg) {
         if (msg.startsWith('test')) {
-          this.callDataCb(`250 ${msg}`);
+          this.callDataCb(`250 ${msg}\r\n`);
         }
       });
       sendCommand(connectionMock, 'test-command')
         .then((responce) => {
-          expect(responce).to.be.equal('250 test-command \r\n');
+          expect(responce).to.deep.equal({
+            code: 250,
+            text: 'test-command',
+          });
           done();
         })
         .catch(done);
@@ -29,12 +32,15 @@ describe('tor', () => {
       const connectionMock = new ConnectionMock();
       connectionMock.onWrite(function onWriteCb(msg) {
         if (msg.startsWith('error')) {
-          this.callDataCb(msg);
+          this.callDataCb(`400 ${msg}\r\n`);
         }
       });
       sendCommand(connectionMock, 'error command')
         .catch((err) => {
-          expect(err.message).to.be.equal('error command \r\n');
+          expect(err).to.deep.equal({
+            code: 400,
+            text: 'error command',
+          });
           done();
         });
     });
@@ -43,13 +49,16 @@ describe('tor', () => {
   describe('sendSignal', () => {
     it('should send signal', (done) => {
       const connectionMock = new ConnectionMock();
+
       sendSignal(connectionMock, 'TEST SIGNAL')
         .then((res) => {
-          expect(res).to.be.equal('250 SIGNAL TEST SIGNAL \r\n');
+          expect(res).to.deep.equal({
+            code: 250,
+            text: 'SIGNAL TEST SIGNAL',
+          });
           done();
         })
         .catch((err) => {
-          console.log(err);
           done(err);
         });
     });
@@ -60,7 +69,10 @@ describe('tor', () => {
       const connection = new ConnectionMock();
       signalNewNYM(connection)
         .then((res) => {
-          expect(res).to.be.equal('250 SIGNAL NEWNYM \r\n');
+          expect(res).to.deep.equal({
+            code: 250,
+            text: 'SIGNAL NEWNYM',
+          });
           done();
         });
     });

@@ -7,7 +7,6 @@ const conn = require('../src/connection');
 
 const {
   prepareConnectOptions,
-  isStatusOk,
   disconnect,
   authenticate,
   connect,
@@ -23,7 +22,6 @@ describe('connection', () => {
       });
       expect(res).to.be.deep.equal({
         path: 'path',
-        password: '',
       });
     });
 
@@ -32,15 +30,7 @@ describe('connection', () => {
       expect(res).to.be.deep.equal({
         port: 9051,
         host: 'localhost',
-        password: '',
       });
-    });
-  });
-
-  describe('isStatusOk', () => {
-    it('should return true if status code 250', () => {
-      expect(isStatusOk('250')).to.be.equal(true);
-      expect(isStatusOk('not a 250')).to.be.equal(false);
     });
   });
 
@@ -68,18 +58,16 @@ describe('connection', () => {
   describe('authenticate', () => {
     const connection = new ConnectionMock();
     connection.onWrite(function onWriteCb(msg) {
-      if (msg === 'AUTHENTICATE "password"\r\n') {
-        return this.callDataCb('250');
-      } else {
-        return this.callDataCb('error');
-      }
+      return (msg === 'AUTHENTICATE "password"\r\n')
+        ? this.callDataCb('250 OK')
+        : this.callDataCb('error');
     });
     it('should authenticate and return promise', (done) => {
       authenticate(connection, 'password')
         .then(() => {
           done();
         })
-        .catch((err) => { throw err });
+        .catch((err) => { throw err; });
     });
 
     it('should return rejected promise if auth failed', (done) => {
@@ -96,28 +84,36 @@ describe('connection', () => {
 
     beforeEach(() => {
       sandbox = sinon.sandbox.create();
+      sandbox.stub(net, 'connect', (connectOptions) => {
+        const connection = new ConnectionMock();
+        connection.options = connectOptions;
+        connection.onWrite(function onWriteCb() {
+          this.callDataCb('250 OK');
+        });
+        return connection;
+      });
     });
 
     afterEach(() => {
       sandbox.restore();
     });
 
-    it('should prepare options and connect', async () => {
-      sandbox.stub(net, 'connect', (connectOptions) => {
-        const connection = new ConnectionMock();
-        connection.options = connectOptions;
-        connection.onWrite(function onWriteCb(msg) {
-          expect(msg).to.be.equal('AUTHENTICATE ""\r\n');
-          this.callDataCb('250');
-        });
-        return connection;
-      });
-
+    it('should use default options and connect', async () => {
       const connection = await connect();
       expect(connection.options).to.deep.equal({
         port: 9051,
         host: 'localhost',
-        password: '',
+      });
+    });
+
+    it('should use provided options and connect', async () => {
+      const connection = await connect({
+        port: 1234,
+        host: '192.168.1.1',
+      });
+      expect(connection.options).to.be.deep.equal({
+        port: 1234,
+        host: '192.168.1.1',
       });
     });
   });

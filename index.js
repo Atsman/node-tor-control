@@ -1,8 +1,10 @@
-const createTorControl = require('./src');
+'use strict';
+
+const { tor, connect } = require('./src');
 
 async function main() {
-  const torControl = await createTorControl({ password: 'Blackpanter' });
-  const info = await torControl.getConf(['ControlPort']);
+  const conn = await connect({ password: 'Blackpanter' });
+  const info = await tor.getConf(conn, ['ControlPort']);
   console.log(info);
 }
 

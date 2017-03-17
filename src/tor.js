@@ -1,17 +1,17 @@
 'use strict';
 
-const { isStatusOk } = require('./connection');
+const { CRLF, STATUS, parseReply } = require('./reply');
 
-function sendCommand(connection, command, keepConnection) {
+function sendCommand(connection, command) {
   return new Promise((resolve, reject) => {
     connection.once('data', (data) => {
-      const message = data.toString();
-      if (!isStatusOk(message)) {
-        return reject(new Error(message));
+      const message = parseReply(data.toString());
+      if (message.code !== STATUS.OK) {
+        return reject(message);
       }
       return resolve(message);
     });
-    connection.write(`${command} \r\n`);
+    connection.write(`${command} ${CRLF}`);
   });
 }
 
@@ -32,14 +32,17 @@ function sendCommand(connection, command, keepConnection) {
  * @param connection - connection to tor control
  * @param request - configuration params
  * @returns {Promise} - result
- */
+ *
 function setConf(connection, request) {
   return sendCommand(`SETCONF ${request}`);
 }
+*/
 
+/*
 function resetConf(connection, request) {
   return sendCommand(`RESETCONF ${request}`);
 }
+*/
 
 /*
  * Request the value of a configuration variable. The syntax is:
@@ -49,6 +52,7 @@ function resetConf(connection, request) {
  * Chapter 3.3.
  *
  */
+/*
 function getConf(connection, params) {
   return sendCommand(connection, `GETCONF ${params.join(' ')}`);
 }
@@ -60,11 +64,13 @@ function getEvents(connection, request) {
 function saveConf(connection, request) {
   return sendCommand(`SAVECONF ${request}`);
 }
+*/
 
 function sendSignal(connection, signal) {
   return sendCommand(connection, `SIGNAL ${signal}`);
 }
 
+/*
 function signalReload(connection) {
   return sendSignal(connection, 'RELOAD', true);
 }
@@ -104,11 +110,21 @@ function signalTerm(connection) {
 function signalInt(connection) {
   return sendSignal(connection, 'INT');
 }
+*/
 
+/*
+ * Switch to clean circuits, so new application
+ * requests don't share any circuits with old ones.
+ * Also clears the client-side DNS cache.
+ * @function signalNewNYM
+ * @param {Object} connection
+ * @returns {Promise}
+ */
 function signalNewNYM(connection) {
   return sendSignal(connection, 'NEWNYM');
 }
 
+/*
 function signalClearDnsCache(connection) {
   return sendSignal(connection, 'CLEARDNSCACHE');
 }
@@ -144,21 +160,25 @@ function setRouterPurpose(nicknameOrKey, purpose) {
 function attachStream(streamId, circuitId, hop) {
   let config = `ATTACHSTREAM ${streamId} ${circuitId}`;
 
+/*
   if (hop) {
     config += ` ${hop}`;
   }
 
   return sendCommand(config);
 }
-
+*/
 module.exports = {
   sendCommand,
+  /*
   setConf,
   resetConf,
   getConf,
   getEvents,
   saveConf,
+  */
   sendSignal,
+  /*
   signalReload,
   signalHup,
   signalShutdown,
@@ -169,7 +189,9 @@ module.exports = {
   signalHalt,
   signalTerm,
   signalInt,
+  */
   signalNewNYM,
+  /*
   signalClearDnsCache,
   mapAddress,
   getInfo,
@@ -177,5 +199,6 @@ module.exports = {
   setCircuitPurpose,
   setRouterPurpose,
   attachStream,
+  */
 };
 

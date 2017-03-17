@@ -2,9 +2,10 @@
   "name": "tor-control",
   "version": "0.0.1",
   "description": "A node library to communicate with tor-control",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "nyc --reporter=html --reporter=text mocha test/index.js",
+    "lint": "eslint src/**/*.js",
     "coverage": "nyc mocha test/index.js"
   },
   "repository": {
@@ -34,5 +35,7 @@
     "sinon": "^1.17.7",
     "sinon-chai": "^2.8.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
 }

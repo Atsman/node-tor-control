@@ -7,4 +7,5 @@ chai.use(sinonChai);
 
 require('./connection.spec');
 require('./tor.spec');
+require('./reply.spec');
 

@@ -13,20 +13,14 @@ npm install tor-control --save
 ```
 
 ```js
-const createTorControl = require('tor-control');
+const { connect, disconnect, tor } = require('tor-control');
 
-const control = createTorControl({
-    password: 'password',                     // Your password for tor-control
-    persistent: false                         // Keep connection (persistent)
-});
+const connection = await connect({ password: 'password' });
 
-control.signalNewnym().then((status) => { // Get a new circuit
-  console.log(status.messages[0]); // --> "OK"
-});
+const status = await tor.signalNewNYM(connection);
 
-control.getInfo(['version', 'exit-policy/ipv4']).then((status) => { // Get info like describe in chapter 3.9 in tor-control specs.
-  console.log(status.messages.join(' - '));
-});
+console.log(status.code); // -> 250
+console.log(status.text); // -> OK
+
 ```
 
-All commands from spec are supported. For further information take a look at the source-code and the specs.

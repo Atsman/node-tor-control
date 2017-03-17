@@ -1,6 +1,11 @@
 'use strict';
 
-const { createTorControl } = require('./tor-control');
+const tor = require('./tor');
+const { connect, disconnect } = require('./connection');
 
-module.exports = createTorControl;
+module.exports = {
+  tor,
+  connect,
+  disconnect,
+};
 

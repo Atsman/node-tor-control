@@ -10,13 +10,13 @@ class ConnectionMock {
       this.onWriteCb(msg);
     }
 
+    let res;
     if (msg.startsWith('SIGNAL')) {
-      return this.callDataCb(`250 ${msg}`);
+      res = this.callDataCb(`250 ${msg}`);
+    } else if (msg === 'QUIT\r\n') {
+      res = this.callEndCb();
     }
-
-    if (msg === 'QUIT\r\n') {
-      return this.callEndCb();
-    }
+    return res;
   }
 
   onWrite(cb) {
@@ -33,7 +33,7 @@ class ConnectionMock {
   }
 
   callEndCb() {
-    const endCb = this.eventCallbackMap['end'];
+    const endCb = this.eventCallbackMap.end;
     if (endCb) {
       this.isEndCbCalled = true;
       endCb();
@@ -41,7 +41,7 @@ class ConnectionMock {
   }
 
   callDataCb(msg) {
-    const dataCb = this.eventCallbackMap['data'];
+    const dataCb = this.eventCallbackMap.data;
     if (dataCb) {
       dataCb(msg);
     }

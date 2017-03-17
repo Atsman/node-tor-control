@@ -1,15 +1,18 @@
 'use strict';
 
 const net = require('net');
+const { STATUS, parseReply } = require('./reply');
 
 const DEFAULT_PORT = 9051;
 const DEFAULT_HOST = 'localhost';
 const DEFAULT_PASSWORD = '';
 
-const STATUS_CODES = {
-  OK: 250,
-};
-
+/*
+ * Prepares connection options. Adds defaults values.
+ * @function prepareConnectOptions
+ * @param {Object} options - connect options
+ * @returns {Object}
+ */
 function prepareConnectOptions(options = {}) {
   const connectOptions = {};
   if (options.path) {
@@ -18,14 +21,16 @@ function prepareConnectOptions(options = {}) {
     connectOptions.port = options.port || DEFAULT_PORT;
     connectOptions.host = options.host || DEFAULT_HOST;
   }
-  connectOptions.password = options.password || DEFAULT_PASSWORD;
   return connectOptions;
 }
 
-function isStatusOk(message) {
-  return Number(message.substr(0, 3)) === STATUS_CODES.OK;
-}
-
+/*
+ * Disconnects from tor control.
+ * @function disconnect
+ * @param {Object} connection
+ * @param {Boolean} force
+ * @returns {Promise}
+ */
 function disconnect(connection, force = false) {
   return new Promise((resolve) => {
     connection.once('end', () => {
@@ -40,25 +45,34 @@ function disconnect(connection, force = false) {
   });
 }
 
-function authenticate(connection, password) {
+/*
+ * Authenticates connection
+ * @function authenticate
+ * @param {Object} connection
+ * @param {String} password
+ * @returns {Promise}
+ */
+function authenticate(connection, password = DEFAULT_PASSWORD) {
   return new Promise((resolve, reject) => {
     connection.once('data', (data) => {
-      return isStatusOk(data.toString()) ?
-        resolve(connection) :
-        reject(`Authentication failed with message: ${data}`);
+      const message = parseReply(data.toString());
+      return message.code === STATUS.OK
+        ? resolve(connection)
+        : reject(`Authentication failed with message: ${data}`);
     });
     connection.write(`AUTHENTICATE "${password}"\r\n`);
   });
 }
 
-function connect(options) {
-  const connectOptions = prepareConnectOptions(options);
-  return authenticate(net.connect(connectOptions), connectOptions.password);
+function connect(options = {}) {
+  return authenticate(
+    net.connect(prepareConnectOptions(options)),
+    options.password
+  );
 }
 
 module.exports = {
   prepareConnectOptions,
-  isStatusOk,
   disconnect,
   authenticate,
   connect,
