@@ -3,7 +3,7 @@
 const { expect } = require('chai');
 
 const {
-  sendCommand, sendSignal, signalNewNYM,
+  sendCommand, sendSignal, signalDump, signalNewNYM,
 } = require('../src/tor');
 
 const ConnectionMock = require('./connection-mock');
@@ -64,17 +64,25 @@ describe('tor', () => {
     });
   });
 
-  describe('signalNewNYM', () => {
-    it('should signal new nym', (done) => {
+  describe('signalDump', () => {
+    it('should signal dump', async () => {
       const connection = new ConnectionMock();
-      signalNewNYM(connection)
-        .then((res) => {
-          expect(res).to.deep.equal({
-            code: 250,
-            text: 'SIGNAL NEWNYM',
-          });
-          done();
-        });
+      const res = await signalDump(connection);
+      expect(res).to.deep.equal({
+        code: 250,
+        text: 'SIGNAL DUMP',
+      });
+    });
+  });
+
+  describe('signalNewNYM', () => {
+    it('should signal new nym', async () => {
+      const connection = new ConnectionMock();
+      const res = await signalNewNYM(connection);
+      expect(res).to.deep.equal({
+        code: 250,
+        text: 'SIGNAL NEWNYM',
+      });
     });
   });
 });

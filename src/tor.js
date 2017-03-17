@@ -82,11 +82,17 @@ function signalHup(connection) {
 function signalShutdown(connection) {
   return sendSignal(connection, 'SHUTDOWN', true);
 }
-
+*/
+/*
+ * Dump stats: log information about open connections and circuits.
+ * @function signalDump
+ * @param {Object} connection
+ * @returns {Promise} - reply
+ */
 function signalDump(connection) {
   return sendSignal(connection, 'DUMP');
 }
-
+/*
 function signalUsr1(connection) {
   return sendSignal(connection, 'USR1');
 }
@@ -182,7 +188,9 @@ module.exports = {
   signalReload,
   signalHup,
   signalShutdown,
+  */
   signalDump,
+  /*
   signalUsr1,
   signalDebug,
   signalUsr2,
