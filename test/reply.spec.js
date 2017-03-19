@@ -29,6 +29,18 @@ describe('reply', () => {
         code: 450,
         text: 'message 2',
       }],
+    }, {
+      input: `
+        250-version=0.2.9.9 (git-56788a2489127072)\r\n
+        250 OK
+      `,
+      output: [{
+        code: 250,
+        text: 'version=0.2.9.9 (git-56788a2489127072)',
+      }, {
+        code: 250,
+        text: 'OK',
+      }],
     }];
 
     it('should parse reply', () => {

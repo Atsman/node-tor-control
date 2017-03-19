@@ -3,10 +3,25 @@
 const assert = require('assert');
 
 const CRLF = '\r\n';
-const lineRegex = /^(\d{3}) (.*)$/;
+const MID_REPLY_LINE_REGEX = /^(\d{3})-(.*)$/;
+const DATA_REPLY_LINE_REGEX = /^(\d{3})+(.*)$/;
+const END_REPLY_LINE_REGEX = /^(\d{3}) (.*)$/;
+
 const STATUS = {
   OK: 250,
 };
+
+function isMidReplyLine(line) {
+  return MID_REPLY_LINE_REGEX.test(line);
+}
+
+function isDataReplyLine(line) {
+  return DATA_REPLY_LINE_REGEX.test(line);
+}
+
+function isEndReplyLine(line) {
+  return END_REPLY_LINE_REGEX.test(line);
+}
 
 /*
  * Checks if line is valid response line.
@@ -16,7 +31,14 @@ const STATUS = {
  * @returns {Boolean}
  */
 function isValidLine(line) {
-  return lineRegex.test(line);
+  return isMidReplyLine(line)
+    || isDataReplyLine(line)
+    || isEndReplyLine(line);
+}
+
+function parseGenericLine(line, regex) {
+  const [, code, text] = line.match(regex);
+  return { code: Number(code), text: text.trim() };
 }
 
 /*
@@ -27,8 +49,15 @@ function isValidLine(line) {
  * @returns {Object} - parsed line
  */
 function parseLine(line) {
-  const [, code, text] = line.match(lineRegex);
-  return { code: Number(code), text };
+  let res;
+  if (isMidReplyLine(line)) {
+    res = parseGenericLine(line, MID_REPLY_LINE_REGEX);
+  } else if (isDataReplyLine(line)) {
+    res = parseGenericLine(line, DATA_REPLY_LINE_REGEX);
+  } else if (isEndReplyLine(line)) {
+    res = parseGenericLine(line, END_REPLY_LINE_REGEX);
+  }
+  return res;
 }
 
 /*
