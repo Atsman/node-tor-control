@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Atsman/node-tor-control.svg?branch=master)](https://travis-ci.org/Atsman/tor-control)
+[![Build Status](https://travis-ci.org/Atsman/node-tor-control.svg?branch=master)](https://travis-ci.org/Atsman/node-tor-control)
 
 # node-tor-control
 A node library to communicate with tor-control
@@ -9,11 +9,11 @@ A node library to communicate with tor-control
 ## How to use
 
 ```bash
-npm install tor-control --save
+npm install node-tor-control --save
 ```
 
 ```js
-const { connect, disconnect, tor } = require('tor-control');
+const { connect, disconnect, tor } = require('node-tor-control');
 
 const connection = await connect({ password: 'password' });
 

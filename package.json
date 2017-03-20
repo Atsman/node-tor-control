@@ -1,5 +1,5 @@
 {
-  "name": "tor-control",
+  "name": "node-tor-control",
   "version": "0.0.1",
   "description": "A node library to communicate with tor-control",
   "main": "src/index.js",
