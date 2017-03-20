@@ -1,11 +1,14 @@
 'use strict';
 
-const { tor, connect } = require('./src');
+const { network } = require('./src');
 
 async function main() {
-  const conn = await connect({ password: 'Blackpanter' });
-  const info = await tor.getConf(conn, ['ControlPort']);
-  console.log(info);
+  try {
+    const res = await network.getSockProxyInfo();
+    console.log(res);
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 main();

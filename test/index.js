@@ -10,4 +10,6 @@ chai.use(chaiAsPromised);
 require('./connection.spec');
 require('./tor.spec');
 require('./reply.spec');
+require('./network.spec');
+require('./process.spec');
 
