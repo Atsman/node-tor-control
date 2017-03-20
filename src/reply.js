@@ -3,8 +3,9 @@
 const assert = require('assert');
 
 const CRLF = '\r\n';
+
 const MID_REPLY_LINE_REGEX = /^(\d{3})-(.*)$/;
-const DATA_REPLY_LINE_REGEX = /^(\d{3})+(.*)$/;
+const DATA_REPLY_LINE_REGEX = /^(\d{3})\+(.*)$/;
 const END_REPLY_LINE_REGEX = /^(\d{3}) (.*)$/;
 
 const STATUS = {

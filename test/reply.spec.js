@@ -31,10 +31,14 @@ describe('reply', () => {
       }],
     }, {
       input: `
+        250+data reply\r\n
         250-version=0.2.9.9 (git-56788a2489127072)\r\n
-        250 OK
+        250 OK\r\n
       `,
       output: [{
+        code: 250,
+        text: 'data reply',
+      }, {
         code: 250,
         text: 'version=0.2.9.9 (git-56788a2489127072)',
       }, {
