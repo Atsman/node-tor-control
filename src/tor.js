@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const _ = require('lodash');
 const { CRLF, STATUS, parseReply } = require('./reply');
 
@@ -8,9 +9,10 @@ const DEFAULT_PASSWORD = '';
 function sendCommand(connection, command) {
   return new Promise((resolve, reject) => {
     connection.once('data', (data) => {
-      const message = _.last(parseReply(data.toString()));
-      if (message && message.code !== STATUS.OK) {
-        return reject(message);
+      const message = parseReply(data.toString());
+      const lastLine = _.last(message);
+      if (lastLine && lastLine.code !== STATUS.OK) {
+        return reject(lastLine);
       }
       return resolve(message);
     });
@@ -156,12 +158,47 @@ function signalClearDnsCache(connection) {
 function mapAddress(address) {
   return sendCommand(`MAPADDRESS ${address}`);
 }
+*/
 
-function getInfo(request) {
-  const config = Array.isArray(request) ? request.join(' ') : request;
-  return sendCommand(`GETCONFIG ${config}`);
+const KEY_VALUE_PAIR_REGEX = /(.+)=(.+)/;
+
+function isKeyValuePair(message) {
+  return KEY_VALUE_PAIR_REGEX.test(message);
 }
 
+function parseKeyValuePair(message) {
+  const [, key, value] = message.match(KEY_VALUE_PAIR_REGEX);
+  return { key, value };
+}
+
+function parseInfoResponse(response) { // TODO: add multiline value parsing
+  return response.reduce((result, line) => {
+    if (isKeyValuePair(line.text)) {
+      const { key, value } = parseKeyValuePair(line.text);
+      Object.assign(result, { [key]: value });
+    }
+    return result;
+  }, {});
+}
+
+/*
+ * Returns data that is not stored in the Tor configuration file,
+ * and that may be longer than a single line.
+ * Chapter 3.9.
+ * @function getInfo
+ * @param {Object} connection
+ * @param {Array} keys - keys
+ * @returns {Promise} - reply
+ */
+async function getInfo(connection, keys) {
+  assert(connection, 'connection must be provided');
+  assert(keys, 'keys must be provided');
+  assert(Array.isArray(keys), 'keys must be an array');
+
+  const response = await sendCommand(connection, `GETINFO ${keys.join(' ')}`);
+  return parseInfoResponse(response);
+}
+/*
 function extendCircuit(id, superspec, purpose) {
   let config = `EXTENDCIRCUIT ${id}`;
   if (superspec) {
@@ -226,7 +263,9 @@ module.exports = {
   /*
   signalClearDnsCache,
   mapAddress,
+  */
   getInfo,
+  /*
   extendCircuit,
   setCircuitPurpose,
   setRouterPurpose,
