@@ -1,18 +1,36 @@
 'use strict';
 
+const _ = require('lodash');
 const { CRLF, STATUS, parseReply } = require('./reply');
+
+const DEFAULT_PASSWORD = '';
 
 function sendCommand(connection, command) {
   return new Promise((resolve, reject) => {
     connection.once('data', (data) => {
-      const message = parseReply(data.toString());
-      if (message.code !== STATUS.OK) {
+      const message = _.last(parseReply(data.toString()));
+      if (message && message.code !== STATUS.OK) {
         return reject(message);
       }
       return resolve(message);
     });
-    connection.write(`${command} ${CRLF}`);
+    connection.write(`${command}${CRLF}`);
   });
+}
+
+/*
+ * Authenticates connection
+ * @function authenticate
+ * @param {Object} connection
+ * @param {String} password
+ * @returns {Promise}
+ */
+async function authenticate(connection, password = DEFAULT_PASSWORD) {
+  try {
+    return await sendCommand(connection, `AUTHENTICATE "${password}"`);
+  } catch (e) {
+    throw new Error(`Authentication failed with message: ${e.text}`);
+  }
 }
 
 /*
@@ -174,8 +192,14 @@ function attachStream(streamId, circuitId, hop) {
   return sendCommand(config);
 }
 */
+
+function quit(connection) {
+  return sendCommand(connection, 'QUIT');
+}
+
 module.exports = {
   sendCommand,
+  authenticate,
   /*
   setConf,
   resetConf,
@@ -208,5 +232,6 @@ module.exports = {
   setRouterPurpose,
   attachStream,
   */
+  quit,
 };
 

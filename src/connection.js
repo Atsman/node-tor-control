@@ -1,11 +1,10 @@
 'use strict';
 
 const net = require('net');
-const { STATUS, parseReply } = require('./reply');
+const { authenticate, quit } = require('./tor');
 
 const DEFAULT_PORT = 9051;
 const DEFAULT_HOST = 'localhost';
-const DEFAULT_PASSWORD = '';
 
 /*
  * Prepares connection options. Adds defaults values.
@@ -41,40 +40,20 @@ function disconnect(connection, force = false) {
       return connection.end();
     }
 
-    return connection.write('QUIT\r\n');
+    return quit(connection);
   });
 }
 
-/*
- * Authenticates connection
- * @function authenticate
- * @param {Object} connection
- * @param {String} password
- * @returns {Promise}
- */
-function authenticate(connection, password = DEFAULT_PASSWORD) {
-  return new Promise((resolve, reject) => {
-    connection.once('data', (data) => {
-      const message = parseReply(data.toString());
-      return message.code === STATUS.OK
-        ? resolve(connection)
-        : reject(`Authentication failed with message: ${data}`);
-    });
-    connection.write(`AUTHENTICATE "${password}"\r\n`);
-  });
-}
 
-function connect(options = {}) {
-  return authenticate(
-    net.connect(prepareConnectOptions(options)),
-    options.password
-  );
+async function connect(options = {}) {
+  const connection = net.connect(prepareConnectOptions(options));
+  await authenticate(connection, options.password);
+  return connection;
 }
 
 module.exports = {
   prepareConnectOptions,
   disconnect,
-  authenticate,
   connect,
 };
 

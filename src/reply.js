@@ -77,7 +77,7 @@ function parseReply(reply) {
     .filter(isValidLine)
     .map(parseLine);
 
-  return (parsedReply.length === 1) ? parsedReply[0] : parsedReply;
+  return parsedReply;
 }
 
 module.exports = {

@@ -3,7 +3,8 @@
 const { expect } = require('chai');
 
 const {
-  sendCommand, sendSignal, signalDump, signalNewNYM,
+  sendCommand, authenticate, sendSignal, signalDump, signalNewNYM,
+  getInfo,
 } = require('../src/tor');
 
 const ConnectionMock = require('./connection-mock');
@@ -43,6 +44,32 @@ describe('tor', () => {
           });
           done();
         });
+    });
+  });
+
+  describe('authenticate', () => {
+    const connection = new ConnectionMock();
+    connection.onWrite(function onWriteCb(msg) {
+      console.log(msg);
+      return msg === 'AUTHENTICATE "password"\r\n'
+        ? this.callDataCb('250 OK\r\n')
+        : this.callDataCb('515 error\r\n');
+    });
+
+    it('should authenticate and return promise', async () => {
+      try {
+        await authenticate(connection, 'password');
+      } catch (e) {
+        throw e;
+      }
+    });
+
+    it('should return rejected promise if auth failed', async () => {
+      try {
+        await authenticate(connection, 'wrongPassword');
+      } catch (e) {
+        expect(e.message).to.be.equal('Authentication failed with message: error');
+      }
     });
   });
 
