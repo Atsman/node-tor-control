@@ -15,7 +15,7 @@ function exec(command, options = {}) {
 
     const p = cp.exec(command, execOptions, (err, stdout, stderr) => {
       if (err) {
-        return reject({ err, stderr });
+        return reject({ err, stdout, stderr });
       }
       return resolve(stdout);
     });

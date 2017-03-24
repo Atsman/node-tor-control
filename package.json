@@ -1,6 +1,6 @@
 {
   "name": "node-tor-control",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A node library to communicate with tor-control",
   "main": "src/index.js",
   "scripts": {

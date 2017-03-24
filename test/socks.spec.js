@@ -5,9 +5,9 @@ const sinon = require('sinon');
 const process = require('../src/process');
 const {
   getSocksProxyInfo,
-} = require('../src/network');
+} = require('../src/socks');
 
-describe('network', () => {
+describe('socks', () => {
   describe('getSocksProxyInfo', () => {
     let sandbox;
     beforeEach(() => {
@@ -41,6 +41,21 @@ describe('network', () => {
           'Unknown key': 'value',
         });
     });
+
+    it('should return stdout form external command error', async () => {
+      sandbox.stub(process, 'exec', () =>
+        Promise.reject({ err: 'err', stdout: 'stdout', stderr: 'stderr' }));
+
+      try {
+        await getSocksProxyInfo();
+      } catch (e) {
+        expect(e).to.be.equal('stdout');
+      }
+    });
+  });
+
+  describe('setSocksProxyInfo', () => {
+    // TODO: write tests
   });
 });
 

@@ -40,6 +40,7 @@ describe('process', () => {
         expect(e).to.be.deep.equal({
           err: new Error('error'),
           stderr: 'error output',
+          stdout: null,
         });
       }
     });

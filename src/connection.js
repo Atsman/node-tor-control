@@ -44,7 +44,6 @@ function disconnect(connection, force = false) {
   });
 }
 
-
 async function connect(options = {}) {
   const connection = net.connect(prepareConnectOptions(options));
   await authenticate(connection, options.password);

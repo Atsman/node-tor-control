@@ -1,12 +1,12 @@
 'use strict';
 
 const tor = require('./tor');
-const network = require('./network');
+const socks = require('./socks');
 const { connect, disconnect } = require('./connection');
 
 module.exports = {
   tor,
-  network,
+  socks,
   connect,
   disconnect,
 };
